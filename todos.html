@@ -1,0 +1,42 @@
+<template name="todos">
+    {{> addTodo}}
+    <ul>
+        {{#each todo}}
+            {{> todoItem}}
+        {{/each}}
+    </ul>
+    {{> todosCount}}
+</template>
+
+<template name="todoItem">
+    <li class="{{checked}}">
+        <input type="checkbox" {{checked}}>
+        <input type="text" value="{{name}}" name="todoItem">
+        [<a href="#" class="delete-todo">Delete</a>]
+    </li>
+</template>
+
+<template name="addTodo">
+    <form>
+        Create a task:
+        <input type="text" plcaholder="Type a task here..." name="todoName">
+    </form>
+</template>
+
+<template name="todosCount">
+    {{#if totalTodos}}
+        <p>You have completed {{completedTodos}} out of {{totalTodos}}</p>
+    {{/if}}
+</template>
+
+<template name="register">
+    <h2>Register</h2>
+</template>
+
+<template name="login">
+    <h2>Login</h2>
+</template>
+
+<template name="home">
+    <p>Welkome to da TuDu App!1jeden </p>
+</template>
