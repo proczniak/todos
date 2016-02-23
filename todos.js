@@ -1,4 +1,5 @@
 Todos = new Mongo.Collection('todos');
+Lists = new Meteor.Collection('lists');
 
 
 if(Meteor.isServer){
@@ -78,11 +79,26 @@ if(Meteor.isClient){
         Todos.update({ _id: documentId }, {$set: { completed: true}});
         console.log("marked complete");
       }
+    },
+  });
+
+  Template.addList.events({
+    'submit-form': function(event){
+      event.preventDefault();
+      var listName = $('[name=listName]').val();
+      Lists.insert({
+        name:listName
+      });
+      $('[name=listName]').val('');
     }
   });
 }
 
+Router.configure({
+  layoutTemplate: 'main'
+});
 Router.route('/', {
+  name: 'home',
   template: 'home'
 });
 Router.route('/register');
