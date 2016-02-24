@@ -12,7 +12,8 @@ if(Meteor.isClient){
 
   Template.todos.helpers({
     'todo': function(){
-      return Todos.find({}, {sort: {createdAt: -1}});
+      currentList = this._id;
+      return Todos.find({listId: currentList}, {sort: {createdAt: -1}});
     }
 
   });
@@ -30,10 +31,10 @@ if(Meteor.isClient){
 
   Template.todosCount.helpers({
     'totalTodos': function(){
-      return Todos.find().count();
+      return Todos.find({listId: currentList}).count();
     },
     'completedTodos': function(){
-      return Todos.find({ completed: true }).count();
+      return Todos.find({listId: currentList, completed: true }).count();
       }
   });
 
@@ -47,10 +48,12 @@ if(Meteor.isClient){
     'submit form': function(event){
       event.preventDefault();
       var todoNAme = $('[name="todoName"]').val();
+      var currentList = this._id;
       Todos.insert({
         name: todoNAme,
         completed: false,
-        createdAt: new Date()
+        createdAt: new Date(),
+        listId: currentList
       });
       $('[name="todoName"]').val('');
     }
@@ -94,6 +97,10 @@ if(Meteor.isClient){
       var listName = $('[name=listName]').val();
       Lists.insert({
         name: listName
+      }, function(error, results){
+        console.log("error: " + error);
+        console.log("results: " + results);
+        Router.go('listPage', { _id: results });
       });
       $('[name=listName]').val('');
     }
@@ -110,10 +117,10 @@ Router.route('/', {
 Router.route('/register');
 Router.route('/login');
 Router.route('/list/:_id', {
+  name: 'listPage',
   template: 'listPage',
   data: function(){
-    //var currentList = this.params._id;
-    //return Lists.findOne({ _id: currentList });
-    return Lists.findOne({ _id: this.params._id });
+    var currentList = this.params._id;
+    return Lists.findOne({ _id: currentList });
   }
 });
