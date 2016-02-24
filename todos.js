@@ -95,14 +95,60 @@ if(Meteor.isClient){
     'submit form': function(event){
       event.preventDefault();
       var listName = $('[name=listName]').val();
+      var currentUser = Meteor.userId();
       Lists.insert({
-        name: listName
+        name: listName,
+        createdBy: currentUser
       }, function(error, results){
-        console.log("error: " + error);
-        console.log("results: " + results);
         Router.go('listPage', { _id: results });
       });
       $('[name=listName]').val('');
+    }
+  });
+
+  Template.register.events({
+    'submit form': function(){
+      event.preventDefault();
+      var email = $('[name=email]').val();
+      var password = $('[name=password]').val();
+      console.log(email);
+      console.log($('[name=password]').val());
+      Accounts.createUser({
+        email: email,
+        password: password
+      }, function(error){
+        if(error){
+          console.log(error.reason);
+        } else {
+          Router.go('home');
+        }
+      });
+    }
+  });
+
+  Template.navigation.events({
+    'click .logout': function(event){
+      event.preventDefault();
+      Meteor.logout();
+      Router.go('login');
+    }
+  });
+
+  Template.login.events({
+    'submit form': function(event){
+      event.preventDefault();
+      var email = $('[name=email]').val();
+      var password = $('[name=password]').val();
+      Meteor.loginWithPassword(email, password, function(error){
+        if (error) {
+          console.log("Login process initiated.");
+          console.log(error.reason);
+          Router.go('login');
+        } else {
+          Router.go('home');
+        }
+      });
+
     }
   });
 }
