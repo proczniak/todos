@@ -37,6 +37,12 @@ if(Meteor.isClient){
       }
   });
 
+  Template.lists.helpers({
+    'list': function(){
+      return Lists.find({}, {sort: {name: 1}});
+    }
+  });
+
   Template.addTodo.events({
     'submit form': function(event){
       event.preventDefault();
@@ -83,11 +89,11 @@ if(Meteor.isClient){
   });
 
   Template.addList.events({
-    'submit-form': function(event){
+    'submit form': function(event){
       event.preventDefault();
       var listName = $('[name=listName]').val();
       Lists.insert({
-        name:listName
+        name: listName
       });
       $('[name=listName]').val('');
     }
