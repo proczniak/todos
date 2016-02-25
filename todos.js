@@ -13,7 +13,8 @@ if(Meteor.isClient){
   Template.todos.helpers({
     'todo': function(){
       currentList = this._id;
-      return Todos.find({listId: currentList}, {sort: {createdAt: -1}});
+      var currentUser = Meteor.userId();
+      return Todos.find({createdBy: currentUser, listId: currentList}, {sort: {createdAt: -1}});
     }
 
   });
@@ -40,7 +41,8 @@ if(Meteor.isClient){
 
   Template.lists.helpers({
     'list': function(){
-      return Lists.find({}, {sort: {name: 1}});
+      var currentUser =  Meteor.userId();
+      return Lists.find({ createdBy: currentUser }, {sort: {name: 1}});
     }
   });
 
@@ -49,10 +51,12 @@ if(Meteor.isClient){
       event.preventDefault();
       var todoNAme = $('[name="todoName"]').val();
       var currentList = this._id;
+      var currentUser = Meteor.userId();
       Todos.insert({
         name: todoNAme,
         completed: false,
         createdAt: new Date(),
+        createdBy: currentUser,
         listId: currentList
       });
       $('[name="todoName"]').val('');
@@ -167,6 +171,15 @@ Router.route('/list/:_id', {
   template: 'listPage',
   data: function(){
     var currentList = this.params._id;
-    return Lists.findOne({ _id: currentList });
+    var currentUser = Meteor.userId();
+    return Lists.findOne({ _id: currentList, createdBy: currentUser });
+  },
+  onBeforeAction: function(){
+    var currentUser = Meteor.userId();
+    if(currentUser){
+      this.next();
+    } else {
+      this.render('login');
+    }
   }
 });
