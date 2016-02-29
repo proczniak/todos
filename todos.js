@@ -112,7 +112,7 @@ if(Meteor.isClient){
 
   Template.register.events({
     'submit form': function(){
-      event.preventDefault();
+     /* event.preventDefault();
       var email = $('[name=email]').val();
       var password = $('[name=password]').val();
       console.log(email);
@@ -127,7 +127,40 @@ if(Meteor.isClient){
           Router.go('home');
         }
       });
+      */
     }
+  });
+
+  Template.register.onRendered(function() {
+    var validator = $('.register').validate({
+      submitHandler: function(event){
+
+        var email = $('[name=email]').val();
+        var password = $('[name=password]').val();
+
+        Accounts.createUser({
+          email: email,
+          password: password
+        }, function(error){
+          if(error){
+            if(error.reason == "Email already exists."){
+              validator.showErrors({
+                email: "Takie konto już istnieje."
+              });
+            }
+            console.log(error.reason);
+          } else {
+            Router.go('home');
+          }
+        });
+      }
+    });
+
+  });
+
+  Template.navigation.helpers({
+    'loggedUzek': function(){
+      return Meteor.user().emails[0].address;}
   });
 
   Template.navigation.events({
@@ -165,13 +198,68 @@ if(Meteor.isClient){
   });
 
   Template.login.onRendered(function(){
-    console.log("The 'login template was just rendered - onRendered().");
-    $('.login').validate();
+    var validator = $('.login').validate({
+      submitHandler: function(event){
+        console.log("Nacisnąłeś submit.");
+
+        var email = $('[name=email]').val();
+        var password = $('[name=password]').val();
+        Meteor.loginWithPassword(email, password, function(error){
+          if (error) {
+            if(error.reason == "User not found"){
+              validator.showErrors({
+                email: "Takie konto nie istnieje w systemie."
+              });
+            }
+            if(error.reason == "Incorrect password"){
+              validator.showErrors({
+                password: "Nieprawidłowe hasło."
+              });
+            }
+
+          } else {
+            var currentRoute = Router.current().route.getName();
+            if (currentRoute == "login") {
+              Router.go('home');
+            }
+          }
+        });
+
+
+      }
+    });
   });
 
   Template.login.onDestroyed(function(){
     console.log("The 'login' template was just destroyed - onDestroyed().")
   });
+
+  $.validator.setDefaults({
+    rules: {
+      email: {
+        required: true,
+        email: true
+      },
+      password: {
+        required: true,
+        minlength: 6
+      }
+    },
+    messages: {
+      email: {
+        required: "Musisz podać email!",
+        email: "Podany email nie jest prawidłowy"
+      },
+      password: {
+        required: "Musisz wprowadzić hasło.",
+        minlength: "Hasło musi zawierać minimum {0} znaków."
+
+      }
+    }
+  });
+
+
+
 }
 
 Router.configure({
