@@ -141,6 +141,7 @@ if(Meteor.isClient){
   Template.login.events({
     'submit form': function(event){
       event.preventDefault();
+/*
       var email = $('[name=email]').val();
       var password = $('[name=password]').val();
       Meteor.loginWithPassword(email, password, function(error){
@@ -155,8 +156,21 @@ if(Meteor.isClient){
           }
         }
       });
-
+*/
     }
+  });
+
+  Template.login.onCreated(function(){
+    console.log("The 'login' template was just created - onCreated().");
+  });
+
+  Template.login.onRendered(function(){
+    console.log("The 'login template was just rendered - onRendered().");
+    $('.login').validate();
+  });
+
+  Template.login.onDestroyed(function(){
+    console.log("The 'login' template was just destroyed - onDestroyed().")
   });
 }
 
