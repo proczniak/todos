@@ -93,6 +93,8 @@
             {{#each list}}
                 <li><a href="{{pathFor route='listPage'}}">{{name}}</a></li>
             {{/each}}
+        {{else}}
+            <li>Loading...</li>
         {{/if}}
     </ul>
 </template>
