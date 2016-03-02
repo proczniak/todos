@@ -16,7 +16,6 @@ if(Meteor.isServer){
 }
 
 if(Meteor.isClient){
-  // client code goes here
 
   Template.todos.helpers({
     'todo': function(){
@@ -52,6 +51,10 @@ if(Meteor.isClient){
       var currentUser =  Meteor.userId();
       return Lists.find({ createdBy: currentUser }, {sort: {name: 1}});
     }
+  });
+
+  Template.lists.onCreated(function(){
+    this.subscribe('lists');
   });
 
   Template.addTodo.events({
@@ -266,17 +269,16 @@ if(Meteor.isClient){
     }
   });
 
-
-
 }
 
 Router.configure({
-  layoutTemplate: 'main'
+  layoutTemplate: 'main',
+  oadingTemplate: 'loading'
 });
 Router.route('/', {
   name: 'home',
   template: 'home',
-  subscriptions: function(){
+  waitOn: function(){
     return Meteor.subscribe('lists');
   }
 });
@@ -303,9 +305,9 @@ Router.route('/list/:_id', {
       this.render('login');
     }
   },
-  subscriptions: function(){
+  waitOn: function(){
     var currentList = this.params._id;
-    return [Meteor.subscribe('todos', currentList), Meteor.subscribe('lists')];
+    return Meteor.subscribe('todos', currentList);
   },
   onAfterAction: function(){
     console.log("You triggered 'onAfterAction' for 'listPage' route.");
