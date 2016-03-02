@@ -4,11 +4,21 @@ Lists = new Meteor.Collection('lists');
 
 if(Meteor.isServer){
   // server code goes here
+  Meteor.publish('lists', function(){
+    var currentUser = this.userId;
+    return Lists.find({ createdBy: currentUser});
+  });
 
+  Meteor.publish('todos', function(currentList){
+    var currentUser = this.userId;
+    return Todos.find({createdBy: currentUser, listId: currentList});
+  });
 }
 
 if(Meteor.isClient){
   // client code goes here
+
+  Meteor.subscribe('lists');
 
   Template.todos.helpers({
     'todo': function(){
@@ -292,10 +302,14 @@ Router.route('/list/:_id', {
       this.render('login');
     }
   },
+  subscriptions: function(){
+    var currentList = this.params._id;
+    return Meteor.subscribe('todos', currentList);
+  },
   onAfterAction: function(){
     console.log("You triggered 'onAfterAction' for 'listPage' route.");
   },
   onStop: function(){
     console.log("You triggered 'onStop' for 'listPage' route.");
-  },
+  }
 });
