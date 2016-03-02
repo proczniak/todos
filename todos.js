@@ -18,8 +18,6 @@ if(Meteor.isServer){
 if(Meteor.isClient){
   // client code goes here
 
-  Meteor.subscribe('lists');
-
   Template.todos.helpers({
     'todo': function(){
       currentList = this._id;
@@ -277,7 +275,10 @@ Router.configure({
 });
 Router.route('/', {
   name: 'home',
-  template: 'home'
+  template: 'home',
+  subscriptions: function(){
+    return Meteor.subscribe('lists');
+  }
 });
 Router.route('/register');
 Router.route('/login');
@@ -304,7 +305,7 @@ Router.route('/list/:_id', {
   },
   subscriptions: function(){
     var currentList = this.params._id;
-    return Meteor.subscribe('todos', currentList);
+    return [Meteor.subscribe('todos', currentList), Meteor.subscribe('lists')];
   },
   onAfterAction: function(){
     console.log("You triggered 'onAfterAction' for 'listPage' route.");
